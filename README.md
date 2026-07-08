@@ -1,15 +1,15 @@
 # opencode-kit
 
-> Un kit clé en main pour transformer [OpenCode](https://github.com/charmbracelet/crush) en un agent IA puissant, avec mémoire persistante et skills spécialisés.
+> Un kit clé en main pour transformer [OpenCode](https://github.com/anomalyco/opencode) en un agent IA puissant, avec mémoire persistante, skills spécialisés, et un heartbeat autonome.
 
-**Contrairement à un simple fichier de config, ce kit inclut un système de mémoire à 3 couches (L1/L2/L3) inspiré de l'architecture interne de Claude Code, des skills prêts à l'emploi, et un mécanisme de consolidation automatique.**
+**Ce kit inclut un système de mémoire à 3 couches (L1/L2/L3), des skills prêts à l'emploi, un mécanisme de consolidation automatique, et un heartbeat (Pouls) qui transforme l'agent en service autonome.**
 
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/nicolaspiron/opencode-kit.git
+git clone https://github.com/npiron/opencode-kit.git
 cd opencode-kit && ./install.sh
 ```
 
@@ -17,49 +17,43 @@ L'installateur crée des **symlinks** (pas de copies) vers `~/.config/opencode/`
 
 ### Prérequis
 
-- [OpenCode](https://github.com/charmbracelet/crush) installé
-- Au moins un provider IA configuré (Claude, Gemini, OpenAI, etc.)
+- [OpenCode](https://github.com/anomalyco/opencode) installé (`curl -fsSL https://opencode.ai/install.sh | sh`)
+- Au moins un provider IA configuré (Claude, DeepSeek, Gemini, OpenAI, etc.)
+- [Bun](https://bun.sh) (pour les plugins npm comme `opencode-tasks`)
 
 ---
 
-## Architecture
+## Heartbeat Pouls
 
-Le kit est structuré autour de **3 couches de mémoire** :
+**Pouls** est un agent de fond qui s'exécute toutes les heures via `opencode-tasks` :
 
-| Couche | Emplacement | Rôle |
-|---|---|---|
-| **L1** | `agents/preferences.md` | Règles comportementales intemporelles (~50 lignes). Toujours chargée. |
-| **L2** | Knowledge Graph (runtime) | Faits structurés : projets, technos, contacts. Queryable via `memory_*`. |
-| **L3** | `~/.config/opencode/memory/sessions/` | Archives datées des sessions. Historique complet. |
+1. **CHECK INBOX** — Lit les mails Gmail avec le label `AgentTrigger`
+2. **PROCESS TASK** — Exécute les demandes (résumé PRs, recherche web, etc.)
+3. **CONSOLIDATE** — Consolide la mémoire si nouvelles sessions
+4. **JOURNAL** — Écrit un log + résumé quotidien dans un Google Doc
 
-### Skills inclus
+Le plugin `pouls-guard` bloque tout email non destiné à `piron.nicolas@gmail.com` et applique un rate limiting (max 3 réponses/battement, 10/jour).
 
-| Skill | Description |
-|---|---|
-| **memory-harness** | Consolidation mémoire en 4 phases (Orient → Gather → Consolidate → Prune) |
-| **google-workspace** | Gmail, Google Docs, Drive, Calendar, Contacts |
-| **git-conventions** | Workflows git, commits, PRs |
-| **scraper** | Web scraping et extraction de données |
-| **devstral-helper** | Optimisation pour modèles locaux (LM Studio / Mistral) |
-| **rulebook** | Règles de code (Clean Code, Refactoring, Pragmatic Programmer) |
+**Setup Gmail requis :**
+1. Créer le label `AgentTrigger`
+2. Créer le label `AgentProcessed`
+3. Créer un filtre : `subject:[AGENT]` → appliquer `AgentTrigger` + archiver
+
+Voir [docs/CAHIER-DES-CHARGES.md](docs/CAHIER-DES-CHARGES.md) pour la spécification complète.
 
 ---
 
 ## Fonctionnalités clés
 
 ### 🧠 Mémoire sceptique
-L'agent vérifie toujours le code réel avant d'agir, même s'il "se souvient" d'une information. La mémoire est un indice, pas une vérité.
+L'agent vérifie toujours le code réel avant d'agir, même s'il "se souvient" d'une information.
 
 ### 🔄 Consolidation automatique
-- **microCompact** : après chaque session, les décisions clés sont ajoutées au Knowledge Graph
-- **fullCompact** : toutes les 3 sessions ou 6h, une consolidation complète fusionne, nettoie et indexe la mémoire
-
-### 🔒 ConsolidationLock
-Un fichier `.consolidate-lock` empêche les écritures concurrentes lors de la consolidation.
+- **microCompact** : après chaque session
+- **fullCompact** : toutes les 3 sessions ou 6h
 
 ### 📦 Import/Export
 - `scripts/import-kg.sh` : importe un Knowledge Graph depuis un export JSON
-- Le KG n'est **pas inclus** dans le repo (données personnelles)
 
 ---
 
@@ -68,18 +62,7 @@ Un fichier `.consolidate-lock` empêche les écritures concurrentes lors de la c
 1. Édite `config/opencode.jsonc` pour configurer tes providers IA
 2. Ajoute tes propres skills dans `skills/`
 3. Modifie `agents/preferences.md` pour adapter le comportement de l'agent
-4. Importe ton KG existant : `./scripts/import-kg.sh backup.json`
-
----
-
-## Mise à jour
-
-```bash
-cd /chemin/vers/opencode-kit
-git pull
-```
-
-Les symlinks pointent vers le repo, donc les mises à jour sont immédiates.
+4. Configure le heartbeat : édite `tasks/pouls-cycle.md` et `heartbeat/repos-whitelist.txt`
 
 ---
 

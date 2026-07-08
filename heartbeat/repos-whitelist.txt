@@ -1,0 +1,6 @@
+# Repos git accessibles pour Pouls (heartbeat)
+# Un chemin absolu par ligne. Lignes vides et commentaires (#) ignorés.
+#
+# Exemples à décommenter :
+# /Users/nicolaspiron/Dev/Evolenia
+# /Users/nicolaspiron/Dev/opencode-kit
