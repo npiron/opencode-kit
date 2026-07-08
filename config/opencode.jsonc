@@ -1,0 +1,44 @@
+{
+  "data": {
+    "directory": ".opencode"
+  },
+  "providers": {
+    "anthropic": {
+      "apiKey": "your-anthropic-api-key",
+      "disabled": false
+    },
+    "openai": {
+      "apiKey": "your-openai-api-key",
+      "disabled": true
+    },
+    "google": {
+      "apiKey": "your-gemini-api-key",
+      "disabled": true
+    },
+    "local": {
+      "apiKey": "not-needed",
+      "disabled": true
+    }
+  },
+  "agents": {
+    "coder": {
+      "model": "claude-sonnet-4-20250514",
+      "maxTokens": 8000
+    },
+    "task": {
+      "model": "claude-sonnet-4-20250514",
+      "maxTokens": 4000
+    },
+    "title": {
+      "model": "claude-sonnet-4-20250514",
+      "maxTokens": 80
+    }
+  },
+  "shell": {
+    "path": "/bin/zsh",
+    "args": ["-l"]
+  },
+  "mcpServers": {},
+  "autoCompact": true,
+  "debug": false
+}

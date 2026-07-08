@@ -1,0 +1,13 @@
+# Personal data exports
+*.bak
+*.export.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Session archives (L3) — user data, not part of the kit
+memory/sessions/
+
+# Consolidation lock — runtime state
+memory/.consolidate-lock
