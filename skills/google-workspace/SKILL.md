@@ -5,32 +5,32 @@ description: Use for Gmail, Google Docs, Drive, Sheets, Calendar, and other Goog
 
 # Google Workspace
 
-Regles et retours d'experience accumules pour l'utilisation des APIs Google Workspace via MCP.
+Rules and lessons learned for using Google Workspace APIs via MCP.
 
-## Regles Gmail
+## Gmail Rules
 
-- **NE JAMAIS envoyer un mail** sans demande explicite de l'utilisateur.
-  Toujours utiliser `draft_gmail_message` (brouillon) et laisser l'utilisateur
-  verifier et valider avant envoi. Cette regle est absolue et prioritaire.
+- **NEVER send an email** without an explicit request from the user.
+  Always use `draft_gmail_message` (draft) and let the user
+  review and approve before sending. This rule is absolute and takes priority.
 
-## Retour d'experience (07/2026)
+## Lessons Learned (07/2026)
 
-- **Compte Gmail principal** : `piron.nicolas@gmail.com` (pas `nicolaspiron@gmail.com`).
-- **APIs Google a activer** : Si erreur "API not enabled", donner directement les liens :
-  - Google Docs API : `https://console.developers.google.com/apis/api/docs.googleapis.com/overview?project=206984738692`
-  - Google Drive API : `https://console.cloud.google.com/flows/enableapi?apiid=drive.googleapis.com`
-- **Upload de fichiers binaires** : Utiliser `fileUrl` (file://...) ou `base64_content`, jamais `content` pour
-  les images/PDF.
-- **Insertion d'image dans Google Docs** :
-  - Preferer `insert_doc_image` avec l'ID Drive plutot que `batch_update_doc` + `insert_image`.
-  - Rendre le fichier public (anyone with link) avant insertion.
-  - Toujours specifier `width` ET `height` (> 0).
-  - Les URLs `drive.google.com/uc?export=view` et `lh3.googleusercontent.com/d/` ne fonctionnent pas
-    pour l'API Docs.
-- **PDF non extractible** : Si `PyPDF2` ne trouve pas de texte, convertir en PNG (`sips`) puis OCR
-  (`tesseract`). Si c'est un plan/schema visuel, l'OCR donnera peu -- integrer l'image directement.
-- **Workflow creation de doc** :
-  1. Importer le contenu texte en Markdown via `import_to_google_doc`
-  2. Ajouter sauts de page avec `batch_update_doc` + `insert_section_break`
-  3. Inserer images avec `insert_doc_image`
-- **Recherche Gmail** : Toujours verifier le bon compte utilisateur avant de lancer `search_gmail_messages`.
+- **Main Gmail account**: `piron.nicolas@gmail.com` (not `nicolaspiron@gmail.com`).
+- **Google APIs to enable**: If "API not enabled" error, provide the links directly:
+  - Google Docs API: `https://console.developers.google.com/apis/api/docs.googleapis.com/overview?project=206984738692`
+  - Google Drive API: `https://console.cloud.google.com/flows/enableapi?apiid=drive.googleapis.com`
+- **Binary file uploads**: Use `fileUrl` (file://...) or `base64_content`, never `content` for
+  images/PDFs.
+- **Image insertion in Google Docs**:
+  - Prefer `insert_doc_image` with the Drive ID rather than `batch_update_doc` + `insert_image`.
+  - Make the file public (anyone with the link) before insertion.
+  - Always specify `width` AND `height` (> 0).
+  - `drive.google.com/uc?export=view` and `lh3.googleusercontent.com/d/` URLs don't work
+    with the Docs API.
+- **Non-extractable PDF**: If `PyPDF2` finds no text, convert to PNG (`sips`) then OCR
+  (`tesseract`). If it's a visual plan/diagram, OCR will yield little — embed the image directly.
+- **Doc creation workflow**:
+  1. Import text content as Markdown via `import_to_google_doc`
+  2. Add page breaks with `batch_update_doc` + `insert_section_break`
+  3. Insert images with `insert_doc_image`
+- **Gmail search**: Always verify the correct user account before running `search_gmail_messages`.

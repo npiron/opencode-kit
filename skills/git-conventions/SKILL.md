@@ -7,45 +7,45 @@ description: Use for git workflows: committing, branching, creating PRs, code re
 
 ## Commits
 
-Format : `<type>(<scope>): <description>`
+Format: `<type>(<scope>): <description>`
 
-Types : `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`
+Types: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`
 
-Exemples :
+Examples:
 - `feat(scraper): add anti-detection headers`
 - `fix(mcp): resolve playwright timeout on slow pages`
 - `refactor(skills): split scraper into sub-skills`
 
-Règles :
-- Description en minuscules, sans point final
-- Max 72 caractères pour la description
-- Commits atomiques : un changement logique = un commit
-- Ne jamais commiter de secrets, tokens, `.env`
+Rules:
+- Lowercase description, no trailing period
+- Max 72 characters for the description
+- Atomic commits: one logical change = one commit
+- Never commit secrets, tokens, `.env`
 
 ## Branches
 
-- `main` : production
-- `feat/<nom>` : nouvelles fonctionnalités
-- `fix/<nom>` : correctifs
-- `refactor/<nom>` : refactoring
+- `main`: production
+- `feat/<name>`: new features
+- `fix/<name>`: bug fixes
+- `refactor/<name>`: refactoring
 
 ## Pull Requests
 
-- Titre descriptif
-- Description : quoi, pourquoi, comment tester
-- Lier l'issue avec `Closes #X`
-- Demander review avant merge
-- Squash merge pour les branches de feature
+- Descriptive title
+- Description: what, why, how to test
+- Link the issue with `Closes #X`
+- Request review before merge
+- Squash merge for feature branches
 
 ## Code Review via GitHub MCP
 
-- Utiliser `@modelcontextprotocol/server-github` pour lister PRs, lire diffs, poster des commentaires
-- Vérifier : style, perfs, sécu, tests, docs
-- Approuver ou demander des changements avec commentaires constructifs
+- Use `@modelcontextprotocol/server-github` to list PRs, read diffs, post comments
+- Check: style, performance, security, tests, docs
+- Approve or request changes with constructive comments
 
-## Ne pas faire
+## Do Not
 
-- `git push --force` sur `main`
-- Commiter directement sur `main`
-- Commiter des fichiers volumineux (>5MB) sans Git LFS
-- Amender des commits déjà poussés sur une branche partagée
+- `git push --force` on `main`
+- Commit directly to `main`
+- Commit large files (>5MB) without Git LFS
+- Amend commits already pushed to a shared branch

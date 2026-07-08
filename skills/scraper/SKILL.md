@@ -1,48 +1,48 @@
 ---
 name: scraper
-description: Use for web scraping, data extraction from websites, crawling multi-page content, handling anti-bot measures, and extracting structured data from HTML. Trigger with keywords: scrape, extract, crawl, récupérer, extraire, parsing, DOM, selectors.
+description: Use for web scraping, data extraction from websites, crawling multi-page content, handling anti-bot measures, and extracting structured data from HTML. Trigger with keywords: scrape, extract, crawl, fetch, parse, parsing, DOM, selectors.
 ---
 
 # Scraping Skill
 
-Méthodologie de scraping web efficace avec Playwright et Fetch.
+Methodology for effective web scraping with Playwright and Fetch.
 
-## Priorité des outils
+## Tool Priority
 
-1. **Fetch MCP** pour le contenu statique/APIs (rapide, léger)
-   - `fetch_markdown` pour pages documentaires
-   - `fetch_txt` pour texte brut
-   - `fetch_readable` pour articles (Readability)
-   - `fetch_json` pour APIs REST
-   - `fetch_youtube_transcript` pour sous-titres YouTube
+1. **Fetch MCP** for static content/APIs (fast, lightweight)
+   - `fetch_markdown` for documentation pages
+   - `fetch_txt` for plain text
+   - `fetch_readable` for articles (Readability)
+   - `fetch_json` for REST APIs
+   - `fetch_youtube_transcript` for YouTube captions
 
-2. **Playwright** pour le contenu dynamique (rendu JS, SPA, formulaires)
-   - Naviguer, cliquer, remplir des formulaires, scroller
+2. **Playwright** for dynamic content (JS rendering, SPAs, forms)
+   - Navigate, click, fill forms, scroll
 
-3. **webfetch** intégré en fallback
+3. **webfetch** built-in as fallback
 
-## Anti-détection
+## Anti-Detection
 
-- Google : accepter les cookies (`Tout accepter`) ou préférer DuckDuckGo
-- Respecter `robots.txt`
-- User-agent réaliste (Playwright le gère par défaut)
-- Pas de rafale de requêtes : attendre 1-2s entre les navigations
+- Google: accept cookies (`Accept all`) or prefer DuckDuckGo
+- Respect `robots.txt`
+- Realistic user-agent (Playwright handles this by default)
+- No burst of requests: wait 1-2s between navigations
 
-## Extraction structurée
+## Structured Extraction
 
-- Utiliser les snapshots Playwright (accessibilité tree) pour extraire le contenu
-- Préférer les sélecteurs stables (data attributes, rôles ARIA) aux classes CSS
-- Pour les tableaux/listes, extraire et formater en markdown
+- Use Playwright snapshots (accessibility tree) to extract content
+- Prefer stable selectors (data attributes, ARIA roles) over CSS classes
+- For tables/lists, extract and format in markdown
 
 ## Pagination
 
-- Détecter les liens "Suivant" / "Page suivante"
-- Parcourir séquentiellement avec un compteur max (défaut: 5 pages)
-- Regrouper les résultats à la fin
+- Detect "Next" / "Next page" links
+- Browse sequentially with a max counter (default: 5 pages)
+- Consolidate results at the end
 
-## Erreurs courantes
+## Common Errors
 
-- 403/429 → attendre 5-10s, réessayer avec moins d'agressivité
-- Cookie wall → cliquer "Tout accepter" ou "Tout refuser"
-- CAPTCHA → abandonner, proposer une alternative
-- Timeout → augmenter le timeout ou simplifier la page cible
+- 403/429 → wait 5-10s, retry with less aggressiveness
+- Cookie wall → click "Accept all" or "Reject all"
+- CAPTCHA → give up, suggest an alternative
+- Timeout → increase timeout or simplify the target page

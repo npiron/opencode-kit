@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ─── opencode-kit installer ───────────────────────────────────────────────
-# Installe le kit en creant des symlinks depuis le repo vers
-# ~/.config/opencode/. Pas de copie, pas d'ecrasement sans backup.
+# Installs the kit by creating symlinks from the repo to
+# ~/.config/opencode/. No copy, no overwrite without backup.
 # ──────────────────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'
@@ -22,7 +22,7 @@ echo ""
 # ─── Pre-flight checks ────────────────────────────────────────────────────
 
 if ! command -v opencode &>/dev/null; then
-    echo -e "${YELLOW}⚠ opencode n'est pas installe.${NC}"
+    echo -e "${YELLOW}⚠ opencode is not installed.${NC}"
     echo "  → brew install charmbracelet/tap/crush"
     echo ""
 fi
@@ -35,13 +35,13 @@ mkdir -p "${OPENDIR}/memory/sessions"
 
 # ─── Symlink agents ────────────────────────────────────────────────────────
 
-echo "→ Installation des agents..."
+echo "→ Installing agents..."
 for file in "${KIT_DIR}/agents/"*.md; do
     if [[ -f "$file" ]]; then
         name=$(basename "$file")
         target="${OPENDIR}/agents/${name}"
         if [[ -L "$target" ]] || [[ -f "$target" ]]; then
-            echo "  ${YELLOW}skip${NC} ${name} (existe deja)"
+            echo "  ${YELLOW}skip${NC} ${name} (already exists)"
         else
             ln -s "$file" "$target"
             echo "  ${GREEN}link${NC} ${name}"
@@ -51,13 +51,13 @@ done
 
 # ─── Symlink skills ────────────────────────────────────────────────────────
 
-echo "→ Installation des skills..."
+echo "→ Installing skills..."
 for skill_dir in "${KIT_DIR}/skills/"*/; do
     if [[ -d "$skill_dir" ]]; then
         name=$(basename "$skill_dir")
         target="${OPENDIR}/skills/${name}"
         if [[ -L "$target" ]] || [[ -d "$target" ]]; then
-            echo "  ${YELLOW}skip${NC} ${name} (existe deja)"
+            echo "  ${YELLOW}skip${NC} ${name} (already exists)"
         else
             ln -s "$skill_dir" "$target"
             echo "  ${GREEN}link${NC} ${name}"
@@ -69,8 +69,8 @@ done
 
 echo "→ Configuration..."
 if [[ -f "${OPENDIR}/opencode.jsonc" ]]; then
-    echo "  ${YELLOW}skip${NC} opencode.jsonc (existe deja, merge manuel recommande)"
-    echo "  Template disponible : ${KIT_DIR}/config/opencode.jsonc"
+    echo "  ${YELLOW}skip${NC} opencode.jsonc (already exists, manual merge recommended)"
+    echo "  Template available : ${KIT_DIR}/config/opencode.jsonc"
 else
     cp "${KIT_DIR}/config/opencode.jsonc" "${OPENDIR}/opencode.jsonc"
     echo "  ${GREEN}copy${NC} opencode.jsonc"
@@ -84,15 +84,15 @@ for script in "${KIT_DIR}/scripts/"*.sh; do
         chmod +x "$script"
     fi
 done
-echo "  ${GREEN}ok${NC} scripts rendus executables"
+echo "  ${GREEN}ok${NC} scripts made executable"
 
 # ─── Done ──────────────────────────────────────────────────────────────────
 
 echo ""
-echo -e "${GREEN}✓ Installation terminee !${NC}"
+echo -e "${GREEN}✓ Installation complete!${NC}"
 echo ""
 echo "Notes :"
-echo "  • Edite ${OPENDIR}/opencode.jsonc pour configurer tes providers IA"
-echo "  • Importe ton Knowledge Graph : ./scripts/import-kg.sh <fichier_export>"
-echo "  • Les archives de session (L3) sont stockees dans ${OPENDIR}/memory/sessions/"
-echo "  • Pour mettre a jour : git pull dans ${KIT_DIR}"
+echo "  • Edit ${OPENDIR}/opencode.jsonc to configure your AI providers"
+echo "  • Import your Knowledge Graph : ./scripts/import-kg.sh <export_file>"
+echo "  • Session archives (L3) are stored in ${OPENDIR}/memory/sessions/"
+echo "  • To update : git pull in ${KIT_DIR}"

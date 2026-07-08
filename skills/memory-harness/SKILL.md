@@ -1,161 +1,161 @@
-# Memory Harness — Consolidation memoire 4 phases
+# Memory Harness — 4-phase memory consolidation
 
-Skill de consolidation memoire inspire de l'architecture KAIROS/autoDream de Claude Code.
-Implemente un systeme de memoire a 3 couches (L1/L2/L3) avec consolidation asynchrone
-et lock anti-concurrence.
+Memory consolidation skill inspired by the KAIROS/autoDream architecture from Claude Code.
+Implements a 3-layer memory system (L1/L2/L3) with asynchronous consolidation
+and a concurrency lock.
 
 ## Architecture
 
 ```
-L1 (preferences.md)     ← Règles intemporelles, toujours chargees
-L2 (Knowledge Graph)     ← Faits structures, queryable
-L3 (archives sessions)   ← Historique daté, jamais relu en entier
+L1 (preferences.md)     ← Timeless rules, always loaded
+L2 (Knowledge Graph)     ← Structured facts, queryable
+L3 (session archives)    ← Dated history, never read in full
 
-.consolidate-lock        ← Mutex fichier (timestamp lastConsolidatedAt)
+.consolidate-lock        ← File mutex (lastConsolidatedAt timestamp)
 ```
 
-## Seuils de consolidation
+## Consolidation thresholds
 
-| Paramètre | Valeur | Description |
+| Parameter | Value | Description |
 |---|---|---|
-| `minSessions` | 3 | Nombre minimum de sessions avant fullCompact |
-| `minHours` | 6 | Temps minimum ecoule avant fullCompact |
-| `maxL1Lines` | 60 | L1 nettoye si depasse cette limite |
+| `minSessions` | 3 | Minimum number of sessions before fullCompact |
+| `minHours` | 6 | Minimum elapsed time before fullCompact |
+| `maxL1Lines` | 60 | L1 cleaned if exceeding this limit |
 
-Ces seuils sont configurables dans le contexte du skill.
+These thresholds are configurable within the skill context.
 
-## Niveaux de compaction
+## Compaction levels
 
-### microCompact (chaque fin de session)
+### microCompact (every session end)
 
-Action rapide, declenchee automatiquement :
-1. Ajouter les decisions cles et nouvelles infos dans le L2 (Knowledge Graph)
-2. Creer un fichier d'archive L3 : `memory/sessions/YYYY-MM-DD.md`
-3. Si une preference explicite est exprimee : l'ajouter dans L1 ET L2
+Quick action, triggered automatically:
+1. Add key decisions and new information to L2 (Knowledge Graph)
+2. Create an L3 archive file: `memory/sessions/YYYY-MM-DD.md`
+3. If an explicit preference is expressed: add it to L1 AND L2
 
-### fullCompact (toutes les `minSessions` sessions ou `minHours` ecoulees)
+### fullCompact (every `minSessions` sessions or `minHours` elapsed)
 
-Consolidation complete en 4 phases :
+Complete consolidation in 4 phases:
 
 ---
 
-## Prompt de consolidation 4 phases
+## 4-phase consolidation prompt
 
-Quand les conditions de fullCompact sont reunies, executer ce workflow :
+When fullCompact conditions are met, execute this workflow:
 
 ### Phase 1 — ORIENT
 
-Objectif : Comprendre l'etat actuel de la memoire avant de la modifier.
+Goal: Understand the current state of memory before modifying it.
 
 ```
-1. Lire L1 (agents/preferences.md) pour comprendre les regles en vigueur
-2. Ouvrir le Knowledge Graph (memory_open_nodes) sur les entites principales
-3. Lister les archives L3 existantes (memory/sessions/)
-4. Verifier le .consolidate-lock pour connaitre lastConsolidatedAt
+1. Read L1 (agents/preferences.md) to understand the rules in effect
+2. Open the Knowledge Graph (memory_open_nodes) on the main entities
+3. List existing L3 archives (memory/sessions/)
+4. Check .consolidate-lock to know lastConsolidatedAt
 ```
 
 ### Phase 2 — GATHER
 
-Objectif : Collecter tous les nouveaux signaux depuis la derniere consolidation.
+Goal: Collect all new signals since the last consolidation.
 
 ```
-1. Scanner les archives L3 creees depuis lastConsolidatedAt
-2. Identifier dans chaque archive :
-   - Decisions cles prises
-   - Nouvelles entites/projets/technos mentionnes
-   - Preferences ou regles exprimees par l'utilisateur
-   - Lecons apprises (erreurs, corrections)
-   - Patterns recurrents
-3. Lister les entites du L2 qui n'ont pas ete mises a jour depuis >30 jours
+1. Scan L3 archives created since lastConsolidatedAt
+2. Identify in each archive:
+   - Key decisions made
+   - New entities/projects/technologies mentioned
+   - Preferences or rules expressed by the user
+   - Lessons learned (errors, corrections)
+   - Recurring patterns
+3. List L2 entities not updated for >30 days
 ```
 
 ### Phase 3 — CONSOLIDATE
 
-Objectif : Fusionner les nouveaux signaux dans la memoire persistante.
+Goal: Merge new signals into persistent memory.
 
 ```
-POUR CHAQUE entite concernee :
-  1. memory_open_nodes sur l'entite existante
-  2. memory_add_observations pour ajouter les nouvelles infos
-  3. Si l'entite n'existe pas : memory_create_entities
+FOR EACH affected entity:
+  1. memory_open_nodes on the existing entity
+  2. memory_add_observations to add new information
+  3. If the entity does not exist: memory_create_entities
 
-POUR CHAQUE relation identifiee :
+FOR EACH identified relation:
   1. memory_create_relations
 
-FUSIONNER les doublons :
-  - Deux entites avec des noms similaires → merger les observations
-  - Deux observations identiques → supprimer le doublon via memory_delete_observations
+MERGE duplicates:
+  - Two entities with similar names → merge observations
+  - Two identical observations → delete the duplicate via memory_delete_observations
 
-METTRE A JOUR le perime :
-  - Supprimer les observations obsolete (memory_delete_observations)
-  - Mettre a jour les entites dont le statut a change
+UPDATE stale data:
+  - Delete obsolete observations (memory_delete_observations)
+  - Update entities whose status has changed
 ```
 
 ### Phase 4 — PRUNE & INDEX
 
-Objectif : Nettoyer et finaliser.
+Goal: Clean up and finalize.
 
 ```
-1. NETTOYER L1 :
-   - Si preferences.md > maxL1Lines (60 lignes) :
-     - Identifier les regles devenues obsoletes
-     - Supprimer ou condenser
-     - Cible : ~50 lignes
+1. CLEAN L1:
+   - If preferences.md > maxL1Lines (60 lines):
+     - Identify rules that have become obsolete
+     - Delete or condense
+     - Target: ~50 lines
 
-2. METTRE A JOUR LE LOCK :
-   - Ecrire le timestamp actuel dans memory/.consolidate-lock
-   - Format : date ISO 8601
+2. UPDATE THE LOCK:
+   - Write current timestamp to memory/.consolidate-lock
+   - Format: ISO 8601 date
 
-3. CREER L'ARCHIVE DE CONSOLIDATION :
-   - Fichier : memory/sessions/YYYY-MM-DD-consolidation.md
-   - Contenu : resume des changements effectues
+3. CREATE THE CONSOLIDATION ARCHIVE:
+   - File: memory/sessions/YYYY-MM-DD-consolidation.md
+   - Content: summary of changes made
 
-4. VERIFIER :
-   - memory_read_graph pour confirmer l'etat final
-   - S'assurer qu'aucune donnee n'a ete perdue
+4. VERIFY:
+   - memory_read_graph to confirm final state
+   - Ensure no data was lost
 ```
 
 ---
 
 ## ConsolidationLock
 
-### Format du fichier
+### File format
 
 ```
 /Users/$USER/.config/opencode/memory/.consolidate-lock
 ```
 
-Contient une seule ligne : le timestamp ISO 8601 de la derniere consolidation.
+Contains a single line: the ISO 8601 timestamp of the last consolidation.
 
 ```
 2026-07-08T14:30:00Z
 ```
 
-### Regles d'acquisition
+### Acquisition rules
 
-1. **Avant de consolider** : verifier que le lock n'est pas deja detenu
-2. **Lock stale** : si le timestamp est >1h, le lock est considere comme perime
-3. **Apres consolidation** : mettre a jour le timestamp
-4. **En cas d'echec** : ne pas modifier le lock (rollback implicite)
-
----
-
-## Regle de "memoire sceptique"
-
-> La memoire est un indice, pas une verite. Toujours verifier le code reel avant d'agir.
-
-En pratique :
-- Avant d'explorer un projet connu : `memory_open_nodes` sur l'entite **puis** explorer le code
-- Si la memoire contredit le code : le code a raison, mettre a jour la memoire
-- Les transcripts L3 ne sont jamais relus en entier, seulement fouilles par mots-cles
-- L'agent traite sa propre memoire comme un "hint" — il doit verifier
+1. **Before consolidating**: verify the lock is not already held
+2. **Stale lock**: if the timestamp is >1h, the lock is considered expired
+3. **After consolidation**: update the timestamp
+4. **On failure**: do not modify the lock (implicit rollback)
 
 ---
 
-## Maintenance periodique
+## "Skeptical memory" rule
 
-Toutes les 10 sessions ou 30 jours (au premier atteint) :
-1. Lister toutes les entites du L2
-2. Identifier les entites non touchees depuis >30 jours
-3. Proposer a l'utilisateur de les archiver ou supprimer
-4. Verifier la coherence des relations (orphelins, circularites)
+> Memory is a hint, not a truth. Always verify the actual code before acting.
+
+In practice:
+- Before exploring a known project: `memory_open_nodes` on the entity **then** explore the code
+- If memory contradicts code: code is right, update memory
+- L3 transcripts are never read in full, only searched by keywords
+- The agent treats its own memory as a "hint" — it must verify
+
+---
+
+## Periodic maintenance
+
+Every 10 sessions or 30 days (whichever comes first):
+1. List all L2 entities
+2. Identify entities untouched for >30 days
+3. Propose to the user to archive or delete them
+4. Verify relation consistency (orphans, circularities)
