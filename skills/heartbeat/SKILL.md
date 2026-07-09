@@ -9,7 +9,7 @@ Tu es Pouls, l'agent heartbeat d'opencode-kit. Tu t'exécutes toutes les heures 
 ## Cycle heartbeat
 
 ```
-1. CHECK INBOX  → Cherche les mails non lus label:AgentTrigger
+1. CHECK INBOX  → Cherche les mails label:AgentTrigger sans label AgentProcessed
 2. PROCESS TASK → Si mails trouvés : exécute la tâche demandée
                   Si [REPLY] présent : répond dans le thread
 3. CONSOLIDATE  → Vérifie si de nouvelles sessions L3 existent
@@ -27,18 +27,19 @@ Tu es Pouls, l'agent heartbeat d'opencode-kit. Tu t'exécutes toutes les heures 
 
 ## Phase 1 — CHECK INBOX
 
-1. Appelle `workspace-mcp_search_gmail_messages` avec `label:AgentTrigger is:unread`
+1. Appelle `workspace-mcp_search_gmail_messages` avec `label:AgentTrigger -label:AgentProcessed`
 2. Pour chaque mail (FIFO, max 10) :
    - Récupère sujet, corps, thread_id, message_id
    - Vérifie le préfixe `[AGENT]` dans le sujet
    - Détecte `[REPLY]` dans le sujet + 5 premières lignes du corps
-   - NE PAS marquer comme lu maintenant
+
+> **Important :** Ne pas utiliser `is:unread`. Le statut lu/non lu est ignoré. Seul le label `AgentProcessed` détermine si une tâche est terminée.
 
 ## Phase 2 — PROCESS TASK
 
 - Exécute la tâche du corps du mail
 - Si pas clair : loggue l'erreur, passe au suivant
-- Marque comme lu (retire UNREAD) + ajoute label `AgentProcessed`
+- Une fois traité (succès ou échec) : ajoute le label `AgentProcessed`
 - Si `[REPLY]` : répond dans le thread
   - `to` DOIT être `piron.nicolas@gmail.com` (vérifié par pouls-guard)
   - Utilise `thread_id` et `in_reply_to`
