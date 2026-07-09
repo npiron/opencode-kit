@@ -1,7 +1,7 @@
 ---
-schedule: "0 * * * *"
+schedule: "* * * * *"
 cwd: /Users/nicolaspiron
-timeout: 3300
+timeout: 55
 ---
 
 # Cycle Heartbeat Pouls
@@ -23,4 +23,4 @@ Tu es Pouls, l'agent heartbeat. Suis le cycle documenté dans le skill `heartbea
 - Max 3 réponses email par battement
 - Max 10 emails traités par battement
 - Loggue chaque phase avec OK/KO
-- Durée max : 55 minutes
+- Durée max : 50 secondes
