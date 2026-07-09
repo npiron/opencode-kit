@@ -51,7 +51,7 @@ L'objectif du projet **Heartbeat** : transformer l'agent interactif en **service
 
 | # | Objectif | Critère de succès |
 |---|----------|-------------------|
-| 1 | Traiter les mails `[AGENT]` | Mail marqué lu/traité ; réponse threadée si demandée |
+| 1 | Traiter les mails `[AGENT]` | Mail marqué lu/traité ; réponse threadée avec le résultat (sauf `[NOREPLY]`) |
 | 2 | Consolider la mémoire (microCompact) | Timestamp mis à jour dans `consolidation.lock` |
 | 3 | Maintenir un journal | `heartbeat.log` + Google Doc quotidien |
 
@@ -62,7 +62,7 @@ L'objectif du projet **Heartbeat** : transformer l'agent interactif en **service
 ```
 Toutes les heures (opencode-tasks daemon) :
   ├── 1. CHECK INBOX   → Mails label:AgentTrigger non lus ?
-  ├── 2. PROCESS TASK  → Exécuter, répondre si [REPLY]
+  ├── 2. PROCESS TASK  → Exécuter, répondre avec le résultat (sauf [NOREPLY])
   ├── 3. CONSOLIDATE   → microCompact si nouvelles sessions L3
   ├── 4. JOURNAL       → heartbeat.log + Google Doc + heartbeat.last
   └── 5. SLEEP         → Exit. Le daemon relancera.
