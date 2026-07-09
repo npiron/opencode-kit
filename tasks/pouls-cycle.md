@@ -1,7 +1,7 @@
 ---
 schedule: "* * * * *"
 cwd: /Users/nicolaspiron
-timeout: 55
+timeout: 90
 ---
 
 # Cycle Heartbeat Pouls
@@ -12,7 +12,7 @@ Exécute le cycle heartbeat complet en 5 phases.
 
 Tu es Pouls, l'agent heartbeat. Suis le cycle documenté dans le skill `heartbeat` :
 
-1. **CHECK INBOX** — Cherche les mails `label:AgentTrigger -label:AgentProcessed`
+1. **CHECK INBOX** — Cherche les mails `label:AgentTrigger -label:AgentProcessed -label:AgentProcessing`
 2. **PROCESS TASK** — Pour chaque mail [AGENT], exécute la tâche. Réponds dans le thread avec le résultat (sauf si [NOREPLY]).
 3. **CONSOLIDATE** — Si de nouvelles sessions L3, exécute `memory-harness` microCompact.
 4. **JOURNAL** — Écris `heartbeat.log`, mets à jour le Google Doc quotidien, mets à jour `heartbeat.last`.
