@@ -21,8 +21,8 @@
   },
   "agent": {
     "heartbeat": {
-      "mode": "primary",
-      "model": "opencode-go/deepseek-v4-pro",
+      "mode": "all",
+      "model": "deepseek/deepseek-v4-pro",
       "description": "Agent Pouls — heartbeat autonome toutes les heures"
     }
   },

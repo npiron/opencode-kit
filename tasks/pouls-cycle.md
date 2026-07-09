@@ -1,6 +1,6 @@
 ---
 schedule: "0 * * * *"
-cwd: ~
+cwd: /Users/nicolaspiron
 timeout: 3300
 ---
 

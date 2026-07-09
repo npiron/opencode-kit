@@ -1,7 +1,7 @@
 ---
 description: Agent Pouls — heartbeat autonome. S'exécute toutes les heures via opencode-tasks pour traiter les mails [AGENT], consolider la mémoire, et maintenir un journal.
-mode: primary
-model: opencode-go/deepseek-v4-pro
+mode: all
+model: deepseek/deepseek-v4-pro
 permission:
   edit: allow
 ---
