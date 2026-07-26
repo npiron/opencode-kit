@@ -6,6 +6,45 @@
 
 ---
 
+## Architecture
+
+```mermaid
+graph TB
+    User[👤 Utilisateur]
+
+    subgraph Kit["opencode-kit (ce repo)"]
+        AgentsKit[agents/]
+        SkillsKit[skills/]
+        PluginsKit[plugins/]
+        ConfigKit[config/]
+        TasksKit[tasks/]
+    end
+
+    subgraph OpenCode["OpenCode Runtime"]
+        Agent[🤖 Agent IA]
+        Skills[🎯 Skills]
+        Guard[🔌 pouls-guard]
+        Heartbeat[💓 Pouls]
+    end
+
+    subgraph Memory["Mémoire"]
+        L1[Working Memory — preferences.md]
+        L2[Session Memory — Knowledge Graph]
+        L3[Knowledge Base — Archives]
+    end
+
+    User -->|email AGENT| Heartbeat
+    Kit -->|symlinks| OpenCode
+    Agent --> Skills
+    Agent --> Guard
+    Guard -->|bloque destructif/spam| Agent
+    Heartbeat --> Agent
+    Agent --> Memory
+    L2 --> L3
+```
+
+---
+
 ## Installation
 
 ```bash

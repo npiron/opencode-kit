@@ -1,0 +1,12 @@
+{
+  "email": {
+    "allowed_recipient": "piron.nicolas@gmail.com",
+    "max_per_beat": 3,
+    "max_per_day": 10
+  },
+  "destructive": {
+    "tool_names": ["delete", "rm", "drop", "trash"],
+    "shell_commands": ["rm -rf", "sudo", "truncate", "mkfs", "dd if=", "git clean", "git reset --hard", "chmod 777"],
+    "git_commands": ["push --force", "push -f", "reset --hard", "clean -fd", "clean -f"]
+  }
+}
