@@ -121,6 +121,36 @@ else
     echo "  ${YELLOW}skip${NC} opencode-tasks (bun not found)"
 fi
 
+echo "→ Dashboard..."
+mkdir -p "${OPENDIR}/scripts"
+dash_source="${KIT_DIR}/dashboard/main.py"
+chmod +x "$dash_source"
+
+# Symlink in ~/.config/opencode/scripts/
+dash_target="${OPENDIR}/scripts/crush-dash"
+if [[ -L "$dash_target" ]] || [[ -f "$dash_target" ]]; then
+    echo "  ${YELLOW}skip${NC} ${OPENDIR}/scripts/crush-dash (already exists)"
+else
+    ln -s "$dash_source" "$dash_target"
+    echo "  ${GREEN}link${NC} ${OPENDIR}/scripts/crush-dash → dashboard/main.py"
+fi
+
+# Symlink in /usr/local/bin for global access
+if [[ -d "/usr/local/bin" ]]; then
+    bin_target="/usr/local/bin/crush-dash"
+    if [[ -L "$bin_target" ]] || [[ -f "$bin_target" ]]; then
+        echo "  ${YELLOW}skip${NC} /usr/local/bin/crush-dash (already exists)"
+    else
+        sudo ln -s "$dash_source" "$bin_target" 2>/dev/null && \
+            echo "  ${GREEN}link${NC} /usr/local/bin/crush-dash" || \
+            echo "  ${YELLOW}skip${NC} /usr/local/bin/crush-dash (sudo required)"
+    fi
+fi
+
+if ! python3 -c "import textual" 2>/dev/null; then
+    echo "  ${YELLOW}⚠  'textual' Python package missing. Install with: pip3 install textual${NC}"
+fi
+
 echo "→ Scripts..."
 for script in "${KIT_DIR}/scripts/"*.sh; do
     if [[ -f "$script" ]]; then
@@ -145,6 +175,7 @@ echo "  • Edit ${OPENDIR}/opencode.jsonc to configure your AI providers"
 echo "  • Edit ${OPENDIR}/.env to set your API keys"
 echo "  • Heartbeat logs : ${OPENDIR}/heartbeat/heartbeat.log"
 echo "  • To update : git pull in ${KIT_DIR}"
+echo "  • Dashboard : crush-dash (or python3 ${KIT_DIR}/dashboard/main.py)"
 echo ""
 echo "Heartbeat Pouls setup (manual) :"
 echo "  1. Create Gmail labels: AgentTrigger, AgentProcessed"

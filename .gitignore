@@ -6,6 +6,10 @@
 .DS_Store
 Thumbs.db
 
+# Python
+__pycache__/
+*.pyc
+
 # Session archives (L3) — user data, not part of the kit
 memory/sessions/
 

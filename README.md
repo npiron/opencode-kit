@@ -25,7 +25,7 @@ L'installateur crée des **symlinks** (pas de copies) vers `~/.config/opencode/`
 
 ## Heartbeat Pouls
 
-**Pouls** est un agent de fond qui s'exécute toutes les heures via `opencode-tasks` :
+**Pouls** est un agent de fond qui s'exécute toutes les 5 minutes via `opencode-tasks` :
 
 1. **CHECK INBOX** — Lit les mails Gmail avec le label `AgentTrigger`
 2. **PROCESS TASK** — Exécute les demandes (résumé PRs, recherche web, etc.)

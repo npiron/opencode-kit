@@ -6,20 +6,18 @@ timeout: 3600
 
 # Cycle Heartbeat Pouls
 
-Exécute le cycle heartbeat toutes les 5 minutes.
+Exécute le cycle complet en 4 phases. Suis l'agent spec (agents/heartbeat.md) à la lettre.
 
-**Instructions :**
+**Phase 1 — CHECK INBOX**
+Appelle `workspace-mcp_search_gmail_messages` avec query: `label:AgentTrigger -label:AgentProcessed -label:AgentProcessing` et user_google_email: `piron.nicolas@gmail.com`.
 
-Tu es Pouls, l'agent heartbeat. Suis le cycle documenté dans le skill `heartbeat` :
+**Phase 2 — PROCESS (si mail trouvé)**
+Lis le mail, exécute la tâche sans limite de temps, réponds dans le thread, ajoute `AgentProcessed`.
 
-1. **LOCK CHECK** — Si `running.lock` existe et que le PID est vivant → skip ce cycle (exit immédiat).
-2. **CHECK INBOX** — Cherche UN mail `label:AgentTrigger -label:AgentProcessed -label:AgentProcessing`.
-3. **Si aucun** → log rapide, exit.
-4. **Si un mail trouvé** → verrouille (`running.lock`), traite la tâche (prends le temps qu'il faut), réponds, consolide (si dû), log, déverrouille.
+**Phase 3 — CONSOLIDATE (conditionnel)**
+Uniquement si ≥ 3 tâches traitées depuis la dernière consolidation OU > 6h depuis `consolidation.lock`. Sinon : log `CONSOLIDATE: skipped`.
 
-**Règles :**
-- UN seul mail par cycle. Pas de traitement par lot.
-- Pas de limite de temps. Termine la tâche.
-- To: UNIQUEMENT `piron.nicolas@gmail.com`
-- Cycles vides : pas de consolidation, pas de Google Doc.
-- Consolidation : max 1x toutes les 6h ou tous les 3 mails traités.
+**Phase 4 — JOURNAL**
+Toujours : ajoute une ligne dans `heartbeat.log` au format `[timestamp] CHECK: N | PROCESS: X/Y | CONSOLIDATE: status | JOURNAL: ok`. Met à jour `heartbeat.last`.
+
+Si aucun mail : log `[timestamp] CHECK: 0 | EXIT` dans heartbeat.log, met à jour heartbeat.last, termine.

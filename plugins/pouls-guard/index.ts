@@ -113,6 +113,8 @@ export default async function poulsGuard(): Promise<Plugin> {
               reason: `[Pouls] Rate limit journalier atteint (max ${MAX_EMAILS_PER_DAY} emails/jour)`
             }
           }
+          // Counter incremented optimistically before send. If the downstream tool fails,
+          // the counter stays incremented (conservative: avoids under-counting on partial failures).
           updateRateLimits({
             emails_sent: limits.emails_sent + 1,
             emails_this_beat: limits.emails_this_beat + 1
